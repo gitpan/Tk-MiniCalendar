@@ -1,0 +1,25 @@
+Revision history for Perl extension Tk::MiniCalendar.
+
+0.06  Wed Nov 23 16:55:28 2005
+  - include CALLBACK hash and MON_ARR in widget attributes
+    --> more than one MiniCalendar possible in one application
+
+0.05  Sun Feb 13 12:34:18 2005
+  - Error in testsuit corrected: used still Local::Tk::xxx namespace :-(
+  - Test Suite enhanced (t/configure.t)
+  - now possible to use $minical->configure(-day => 3, -month => 9, -year => 2005)
+    instead of $minical->select_date(2005, 9, 3)
+
+0.04  Fri Feb 05 18:45:23 2005
+  - Name space changed: Local::Tk::Minicalendar -> Tk::MiniCalendar
+  - Docu improved.
+
+0.03  Sun Jan 09 16:18:52 2005
+  - use Tk::XPMs for arrow buttons
+
+0.02  Thu Sep 23 12:23:45 2004
+  - Test Suite enhanced
+
+0.01  Thu Sep 23 10:05:18 2004
+	- original version; created by Lorenz Domke
+
