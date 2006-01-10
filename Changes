@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.07  Tue Jan 10 15:54:21 2006
+  - require Tk in PREREQ_PM
+  
 0.06  Wed Nov 23 16:55:28 2005
   - include CALLBACK hash and MON_ARR in widget attributes
     --> more than one MiniCalendar possible in one application

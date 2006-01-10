@@ -8,6 +8,7 @@ WriteMakefile(
     dist => { POSTOP => ('@echo "************  ATTENTION: are README, Changes und MANIFEST ok ? *******"') },
     PREREQ_PM         => {Tk::XPMs => 1.03,
                           Date::Calc => 5.0,
+                          Tk => '0',
                          }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Tk/MiniCalendar.pm', # retrieve abstract from module

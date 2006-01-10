@@ -1,6 +1,6 @@
 package Tk::MiniCalendar;
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Tk;
 use Tk::XPMs qw(:arrows);
