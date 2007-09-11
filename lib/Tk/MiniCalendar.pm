@@ -1,8 +1,9 @@
 package Tk::MiniCalendar;
 
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 use Tk;
+use Tk::BrowseEntry;
 use Tk::XPMs qw(:arrows);
 use Carp;
 use Date::Calc qw(
@@ -65,7 +66,9 @@ The widget looks like:
 
 The year can be entered directly into the corresponding entry field. The "<<" and ">>"
 buttons allow the user to scroll one year back or forth and the "<" and ">"
-buttons can be used for scrolling through the months of a year.
+buttons can be used for scrolling through the months of a year. The month
+can also be selected directly from a pulldown menu which can be invoked
+by clicking the monthname.
 
 Clicking with mouse button one on a day selects that day. The selected day
 can be retrieved with the $minical->date() method.
@@ -132,6 +135,7 @@ The following methods are provided by Tk::MiniCalendar:
 # valid options for MiniCalendar:
 my @validArgs = qw( -day -month -year -day_names -month_names);
 
+my $mtxt;
 
 sub Populate { # {{{
   my ($w, $args) = @_;
@@ -227,11 +231,32 @@ sub Populate { # {{{
    #-width => 2,
   )->pack(-side => "left");
 
-  $w->{l_mm} = $frm1->Label(
-    -text => $w->{MONNAME}[$w->{MONTH}-1],
-    -width => 8,
-    -background => "#FFFFFF",
+
+  $mtxt = $w->{MONNAME}[$w->{MONTH}-1];
+  $w->{l_mm} = $frm1->BrowseEntry(
+    -variable   => \$mtxt,
+    -width      => 10,
+    -background => "white",
+    -listheight => 12,
+    -browsecmd => sub {
+        $w->{MONTH} = index_of($w, $mtxt);
+        display_month($w,  $w->{YEAR}, $w->{MONTH});
+     },
+     -choices => $w->{MONNAME},
   )->pack(-side => "left");
+
+  sub index_of {
+    my $w = shift;
+    my $m_name = shift;
+    my $i = 0;
+    foreach my $mnm ( @{ $w->{MONNAME} }){
+      $i++;
+      return $i if $mnm eq $m_name;
+    }
+    return $i;
+  }
+
+
   my $e_yyyy = $frm1->Entry(
     -width => 6,
     -textvariable => \$w->{YEAR},
@@ -347,6 +372,7 @@ sub month {
   }
 }
 
+
 sub year {
   my ($w, $y) = @_;
   if ($#_ > 0 ){
@@ -452,9 +478,7 @@ Displays the specified month.
   $w->{YEAR_BAK} = $yyyy;
   $w->{MONTH}     = $mm;
 
-  $w->{l_mm}->configure(
-        -text => $w->{MONNAME}[$mm-1],
-  );
+  $mtxt = $w->{MONNAME}[$mm-1],
 
   my $day = " ";
   my $dim = Days_in_Month($yyyy, $mm);

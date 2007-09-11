@@ -1,3 +1,4 @@
+#! d:/perl587/bin/perl.exe
 #########################
 use Test::More;
 use Tk;
@@ -6,7 +7,7 @@ use Tk::MiniCalendar;
 ok(1, "load module"); # If we made it this far, we're ok.
 
 #########################
-my $top = MainWindow->new;
+my $top = MainWindow->new(-title => "handler");
 
 my $frm1=$top->Frame->pack;
 my $frm2=$top->Frame->pack;
@@ -70,8 +71,7 @@ my $b_ok = $frm3->Button(
   -text      => "Ok",
   -width     => 4,
   -command   => sub{
-    ok(1, "ok button");
-    exit;
+    s_ok();
    },
 )->pack(-side => "left", -padx => 2, -pady => 2);
 
@@ -79,8 +79,7 @@ my $b_nok = $frm3->Button(
   -text      => "Not Ok",
   -width     => 8,
   -command   => sub{
-    ok(0, "not ok button");
-    exit;
+    s_noc();
    },
 )->pack(-side => "left", -padx => 2, -pady => 2);
 
@@ -91,8 +90,19 @@ is($sy, 2006, "start date: year");
 is($sm, "05", "start date: month");
 is($sd, 16, "start date: day");
 
+if (! $ENV{INTERACTIVE_MODE}){
+  $top->after(500, sub{s_ok()});
+}
 MainLoop;
 
+sub s_ok {
+  ok(1, "ok button");
+  exit;
+}
+sub s_nok {
+  ok(0, "not ok button");
+  exit;
+}
 __END__
 
  vim:foldmethod=marker:foldcolumn=4:ft=perl

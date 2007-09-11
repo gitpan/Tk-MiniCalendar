@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+test_mc.pl
 t/basic.t
 t/basic2.t
 t/configure.t

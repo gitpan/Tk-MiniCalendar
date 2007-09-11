@@ -6,7 +6,7 @@ use Tk::MiniCalendar;
 ok(1, "load module"); # If we made it this far, we're ok.
 
 #########################
-my $top = MainWindow->new;
+my $top = MainWindow->new(-title => "basic2");
 
 my $frm1=$top->Frame->pack;
 my $frm2=$top->Frame->pack;
@@ -34,7 +34,45 @@ $b_s = $frm3->Button(
   -text      => "Start",
   -width     => 4,
   -command   => sub{
+    s_start();
+   },
+)->pack(-side => "left", -padx => 2, -pady => 2);
 
+$b_ok = $frm3->Button(
+  -text      => "Ok",
+  -width     => 4,
+  -command   => sub{
+     s_ok();
+   },
+   -state => "disabled",
+)->pack(-side => "left", -padx => 2, -pady => 2);
+
+$b_nok = $frm3->Button(
+  -text      => "Not Ok",
+  -width     => 8,
+  -command   => sub{
+     s_nok();
+   },
+   -state => "disabled",
+)->pack(-side => "left", -padx => 2, -pady => 2);
+
+
+if (! $ENV{INTERACTIVE_MODE}){
+  $top->after(200, sub{s_start()});
+  $top->after(500, sub{s_ok()});
+}
+MainLoop;
+sub s_ok {
+  ok(1, "ok button");
+  exit;
+}
+
+sub s_nok {
+  ok(0, "not ok button");
+  exit;
+}
+
+sub s_start {
     # set to 15.10.1957
     $minical->select_date(1957, 10, 15);
     my ($y, $m, $d) = $minical->date;
@@ -70,34 +108,7 @@ $b_s = $frm3->Button(
      is($sm, "04", "start date: month");
      is($sd, 11, "start date: day");
 
-
-   },
-)->pack(-side => "left", -padx => 2, -pady => 2);
-
-$b_ok = $frm3->Button(
-  -text      => "Ok",
-  -width     => 4,
-  -command   => sub{
-    ok(1, "display_month");
-    exit;
-   },
-   -state => "disabled",
-)->pack(-side => "left", -padx => 2, -pady => 2);
-
-$b_nok = $frm3->Button(
-  -text      => "Not Ok",
-  -width     => 8,
-  -command   => sub{
-    ok(0, "not ok button");
-    exit;
-   },
-   -state => "disabled",
-)->pack(-side => "left", -padx => 2, -pady => 2);
-
-
-
-MainLoop;
-
+}
 __END__
 
  vim:foldmethod=marker:foldcolumn=4:ft=perl

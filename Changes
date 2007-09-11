@@ -1,5 +1,11 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.09  Tue Sep 11 13:12:43 2007
+  - Testsuite will run without interaction from user
+
+0.08  Mon Sep 04 17:31:35 2006
+  - Pulldown for month selection
+  
 0.07  Tue Jan 10 15:54:21 2006
   - require Tk in PREREQ_PM
   

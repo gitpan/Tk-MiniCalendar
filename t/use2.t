@@ -20,7 +20,7 @@ use warnings;
 use Tk;
 use Tk::MiniCalendar;
 
-my $top = MainWindow->new;
+my $top = MainWindow->new(-title => "use2");
 my $l = $top->Label(
   -text => <<EOT,
   Please select date of tomorrow in upper 
@@ -37,6 +37,16 @@ my $m2 = $f->MiniCalendar->pack;
 
 $m1->register('<Button-1>', \&b11);
 $m2->register('<Button-1>', \&b12);
+
+if (! $ENV{INTERACTIVE_MODE}){
+  my ($yy, $mm, $dd) = Add_Delta_Days(Today,1);
+  $m1->select_date($yy, $mm, $dd);
+  $top->after(200, sub{b11($yy, $mm, $dd)});
+  
+  #($yy, $mm, $dd) = Add_Delta_Days(Today,-1);
+  #$m2->select_date($yy, $mm, $dd);
+  #$top->after(500, sub{b12($yy, $mm, $dd)});
+}
 MainLoop;
 
 sub b11 {
@@ -53,7 +63,16 @@ sub b11 {
   MiniCalendar.
 EOT
   -fg => "blue",
-    ),
+    );
+    if (! $ENV{INTERACTIVE_MODE}){
+     # my ($yy, $mm, $dd) = Add_Delta_Days(Today,1);
+    #  $m1->select_date($yy, $mm, $dd);
+    #  $top->after(200, sub{b11($yy, $mm, $dd)});
+  
+      my ($yy, $mm, $dd) = Add_Delta_Days(Today,-1);
+      $m2->select_date($yy, $mm, $dd);
+      $top->after(500, sub{b12($yy, $mm, $dd)});
+    }
   }
 }
 

@@ -6,7 +6,7 @@ use Tk::MiniCalendar;
 ok(1, "load module"); # If we made it this far, we're ok.
 
 #########################
-my $top = MainWindow->new;
+my $top = MainWindow->new(-title => "date_error");
 
 my $frm1=$top->Frame->pack;
 my $frm2=$top->Frame->pack;
