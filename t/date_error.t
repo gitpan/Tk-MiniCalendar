@@ -21,7 +21,7 @@ eval {
   -year => 2003,
  )->pack(-pady => 4, -padx => 4);
 };
-print "$@\n";
+print "expected: $@\n";
 ok($@, "Error in date");
 #-------------
 

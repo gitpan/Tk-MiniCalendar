@@ -1,6 +1,7 @@
 package Tk::MiniCalendar;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
+our $TKV = "804.027";
 
 use Tk;
 use Tk::BrowseEntry;
@@ -231,6 +232,17 @@ sub Populate { # {{{
    #-width => 2,
   )->pack(-side => "left");
 
+  my $text;
+  if ($Tk::VERSION < $TKV) {
+    $text = <<'EOT';
+  $w->{l_mm} = $frm1->Label(
+    -text => $w->{MONNAME}[$w->{MONTH}-1],
+    -width => 8,
+    -background => "#FFFFFF",
+  )->pack(-side => "left");
+EOT
+  } else {
+    $text = <<'EOT';
 
   $mtxt = $w->{MONNAME}[$w->{MONTH}-1];
   $w->{l_mm} = $frm1->BrowseEntry(
@@ -244,6 +256,9 @@ sub Populate { # {{{
      },
      -choices => $w->{MONNAME},
   )->pack(-side => "left");
+EOT
+  }
+  eval $text;
 
   sub index_of {
     my $w = shift;
@@ -478,7 +493,13 @@ Displays the specified month.
   $w->{YEAR_BAK} = $yyyy;
   $w->{MONTH}     = $mm;
 
-  $mtxt = $w->{MONNAME}[$mm-1],
+  if ($Tk::VERSION < $TKV) {
+    $w->{l_mm}->configure(
+        -text => $w->{MONNAME}[$mm-1],
+  );
+  } else {
+    $mtxt = $w->{MONNAME}[$mm-1],
+  }
 
   my $day = " ";
   my $dim = Days_in_Month($yyyy, $mm);

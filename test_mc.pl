@@ -4,9 +4,9 @@
 # in interactive mode
 use strict;
 use warnings;
-use lib "lib/Tk/";
 
 foreach my $script (<t/*.t>){
   $ENV{INTERACTIVE_MODE} = 1;
+  $ENV{PERL5LIB} = "./lib";
   system "perl $script";
 }

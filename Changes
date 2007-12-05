@@ -1,5 +1,10 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.10  Tue Dec 04 12:37:42 2008
+  - check Tk Version. Versions less than 804.027 will not use
+    Tk::BrowseEntry
+  - setenv PERL5LIB in test_mc.pl
+
 0.09  Tue Sep 11 13:12:43 2007
   - Testsuite will run without interaction from user
 
