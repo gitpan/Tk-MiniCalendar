@@ -1,8 +1,9 @@
 #########################
 use Test::More;
 use Tk;
-BEGIN { plan tests => 2 };
+BEGIN { plan tests => 17 };
 use Tk::MiniCalendar;
+use Date::Calc qw(Add_Delta_YM Today);
 ok(1, "load module"); # If we made it this far, we're ok.
 
 #########################
@@ -14,6 +15,8 @@ my $frm4=$top->Frame->pack;
 my $frm3=$top->Frame->pack;
 #------------- use MiniCalendar widget:
 # use default values
+
+my ($y, $m, $d) = Today;
 
 my $minical=$frm1->MiniCalendar(
 )->pack(-pady => 4, -padx => 4);
@@ -67,10 +70,30 @@ my $b_nok = $frm3->Button(
    },
 )->pack(-side => "left", -padx => 2, -pady => 2);
 
+$top->after(100, sub{check_today()});
 if (! $ENV{INTERACTIVE_MODE}){
   $top->after(500, sub{s_ok()});
 }
 MainLoop;
+
+sub check_today {
+  my ($cal_y, $cal_m, $cal_d) = $minical->date;
+  is($cal_y + 0, $y + 0, "curret year");
+  is($cal_m + 0, $m + 0, "curret month");
+  is($cal_d + 0, $d + 0, "curret day");
+
+  # switch to next months and check month display label
+  my @MM = $minical->_get_month_names;
+  for (my $k=1; $k<13; $k++) {
+    my ($ny, $nm, $nd) = Add_Delta_YM($y, $m, $d, 0, $k);
+    $minical->display_month($ny, $nm);
+    my $mm = $minical->_get_month_label();
+    my $index = ($k + $m - 1) % 12;
+    is($mm, $MM[$index], "month label $MM[$index]");
+  }
+  # switch back to current month
+  $minical->display_month($y, $m);
+}
 
 sub s_ok {
   ok(1, "ok button");

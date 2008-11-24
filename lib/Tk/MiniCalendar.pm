@@ -1,6 +1,6 @@
 package Tk::MiniCalendar;
 
-our $VERSION = "0.10";
+our $VERSION = "0.12";
 our $TKV = "804.027";
 
 use Tk;
@@ -69,7 +69,7 @@ The year can be entered directly into the corresponding entry field. The "<<" an
 buttons allow the user to scroll one year back or forth and the "<" and ">"
 buttons can be used for scrolling through the months of a year. The month
 can also be selected directly from a pulldown menu which can be invoked
-by clicking the monthname.
+by clicking the month name.
 
 Clicking with mouse button one on a day selects that day. The selected day
 can be retrieved with the $minical->date() method.
@@ -91,6 +91,8 @@ Only the following event specifications are recognized:
  <Button-2>  <Double-2>
  <Button-3>  <Double-3>
 
+ <Display-Month>
+
 If one of those events occurs on one of the displayed days, the registered callback
 is invoked with the following parameters:
 
@@ -99,6 +101,11 @@ is invoked with the following parameters:
 NOTE: If there are two handlers for <Button-n> and <Double-n> then both handlers are
 invoked in case of a double-button-n event because a double-button-n event is also a
 button-n event.
+
+A callback routine for the special "event" E<lt>Display-MonthE<gt> will be called each time
+the minicalendar is updated i.e. when a month has been displayed. This can be used to
+hilight certain days with different colors. See also C<hilight> method below. Note that in
+this case the $dd parameter is always set to 1.
 
 =head1 EXAMPLE
 
@@ -124,6 +131,64 @@ Here is a fullblown example for the usage of Tk::MiniCalendar
             );
  MainLoop;
 
+=head1 OPTIONS
+
+The following options can be specified for Tk::MiniCalendar:
+
+=over 4
+
+=item * -day => <day>
+
+Sepcify first selected day.
+
+=item * -month => <month>
+
+Sepcify first selected month.
+
+=item * -year => <year>
+
+Sepcify first selected year.
+
+=item * -day_names => <array_ref>
+
+Reference to an array which holds the labels for the day names. 
+This can be used to define labels for another language.
+
+=item * -month_names => <array_ref>
+
+Reference to an array which holds the labels for the month names. 
+
+=item * -bg => <color>
+
+Background color. Note that this changes only the outer part of the widget. Day name labels and the
+main area of the calendar are not affected.
+
+=item * -bg_color => <color>
+
+Background color for the area which contains the day numbers.
+
+=item * -fg_color => <color>
+
+Foreground color for the day numbers.
+
+=item * -bg_label_color => <color>
+
+Background color for the day name labels. Should be the same as -bg.
+
+=item * -fg_label_color => <color>
+
+Foreground color for the day name labels.
+
+=item * -bg_sel_color => <color>
+
+Background color for the selected day.
+
+=item * -fg_sel_color => <color>
+
+Foreground color for the selected day.
+
+=back
+
 =head1 METHODS
 
 The following methods are provided by Tk::MiniCalendar:
@@ -134,9 +199,12 @@ The following methods are provided by Tk::MiniCalendar:
 
 
 # valid options for MiniCalendar:
-my @validArgs = qw( -day -month -year -day_names -month_names);
+my @validArgs = qw( -day -month -year -day_names -month_names -bg_color -fg_color
+ -bg_label_color -fg_label_color
+ -bg_sel_color -fg_sel_color
+);
 
-my $mtxt;
+our $mtxt;
 
 sub Populate { # {{{
   my ($w, $args) = @_;
@@ -164,6 +232,13 @@ sub Populate { # {{{
     # $MON_ARR[$i][$j] is on position $j in line $i
     #                  0 <= $i <= 5,  0 <= $j <= 6
 
+    # color options
+    $w->{BG_COLOR}     = 'white' ;
+    $w->{FG_COLOR}     = 'black' ;
+    $w->{BG_SEL_COLOR}     = 'blue' ;
+    $w->{FG_SEL_COLOR}     = 'white' ;
+    $w->{BG_LABEL_COLOR}     = '#bFbFbF' ;
+    $w->{FG_LABEL_COLOR}     = 'black' ;
 
     # handle options:
     $w->{DAY}      = $received{"-day"}         if defined $received{"-day"};
@@ -171,6 +246,7 @@ sub Populate { # {{{
     $w->{YEAR}     = $received{"-year"}        if defined $received{"-year"};
     $w->{DAYNAME}  = $received{"-day_names"}   if defined $received{"-day_names"};
     $w->{MONNAME}  = $received{"-month_names"} if defined $received{"-month_names"};
+
     # check: 7 names for DAYNAME, 12 names for MONNAME
     if (defined $received{"-day_names"} and @{ $received{"-day_names"}} != 7){
       croak "error in names array for -day_names option: must provide 7 names";
@@ -196,6 +272,12 @@ sub Populate { # {{{
     -year     => [METHOD => "year", "Year", $y],
     -day_names     => [PASSIVE => "day_names", "Day_names", \@{ $w->{DAYNAME} }],
     -month_names   => [PASSIVE => "month_names", "Month_names", \@{ $w->{MONNAME} }],
+    -bg_color    => [METHOD => "bg_color", "Bg_color", 'white'],
+    -fg_color    => [METHOD => "fg_color", "Fg_color", 'black'],
+    -bg_sel_color    => [METHOD => "bg_sel_color", "Bg_sel_color", 'blue'],
+    -fg_sel_color    => [METHOD => "fg_sel_color", "Fg_sel_color", 'white'],
+    -bg_label_color    => [METHOD => "bg_label_color", "Bg_label_color", '#bFbFbF'],
+    -fg_label_color    => [METHOD => "fg_label_color", "Fg_label_color", 'black'],
   );
 
   #
@@ -305,10 +387,14 @@ EOT
   # Calendar frame for month
   my $i = 0;
   foreach my $day ( @{$w->{DAYNAME}}){
+    $w->{LABELS}->[$i] =
     $frm2->Label(
         -text => $day,
+        -background => $w->{BG_LABEL_COLOR},
+        -foreground => $w->{FG_LABEL_COLOR},
         -width => 3,
-      )->grid( -column => $i, -row => 0, -sticky => "w", -padx => 1, -pady => 2);
+      );
+    $w->{LABELS}->[$i] ->grid( -column => $i, -row => 0, -sticky => "w", -padx => 1, -pady => 2);
       $i++;
   }
   my $day = " ";
@@ -367,7 +453,7 @@ EOT
 
 # Methods
 
-sub day {
+sub day { # {{{
   my ($w, $d) = @_;
   if ($#_ > 0 ){
     $w->{SEL_DAY} = $d;
@@ -375,9 +461,9 @@ sub day {
   } else {
     $w->{SEL_DAY};
   }
-}
+} # }}}
 
-sub month {
+sub month { # {{{
   my ($w, $m) = @_;
   if ($#_ > 0 ){
     $w->{SEL_MONTH} = $m;
@@ -385,10 +471,9 @@ sub month {
   } else {
     $w->{SEL_MONTH};
   }
-}
+} # }}}
 
-
-sub year {
+sub year { # {{{
   my ($w, $y) = @_;
   if ($#_ > 0 ){
     $w->{SEL_YEAR} = $y;
@@ -396,7 +481,65 @@ sub year {
   } else {
     $w->{SEL_YEAR};
   }
-}
+} # }}}
+
+sub fg_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{FG_COLOR} = $c;
+    display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
+  } else {
+    $w->{FG_COLOR};
+  }
+} # }}}
+
+sub bg_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{BG_COLOR} = $c;
+    display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
+  } else {
+    $w->{BG_COLOR};
+  }
+} # }}}
+
+sub fg_label_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{FG_LABEL_COLOR} = $c;
+    _configure_labels($w);
+  } else {
+    $w->{FG_LABEL_COLOR};
+  }
+} # }}}
+
+sub bg_label_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{BG_LABEL_COLOR} = $c;
+    _configure_labels($w);
+  } else {
+    $w->{BG_LABEL_COLOR};
+  }
+} # }}}
+
+sub fg_sel_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{FG_SEL_COLOR} = $c;
+  } else {
+    $w->{FG_SEL_COLOR};
+  }
+} # }}}
+
+sub bg_sel_color { # {{{
+  my ($w, $c) = @_;
+  if ($#_ > 0 ){
+    $w->{BG_SEL_COLOR} = $c;
+  } else {
+    $w->{BG_SEL_COLOR};
+  }
+} # }}}
 
 sub date{ #{{{ -----------------------------------------------------
 
@@ -419,7 +562,7 @@ sub select_date{ #{{{ ----------------------------------------------
 =head2 $minical->select_date($year, $month, $day)
 
 Selects a date and positions the MiniCalendar to the corresponding year
-and month. The selected date is highlighted.
+and month. The selected date is hilighted.
 
 =cut
 
@@ -440,7 +583,7 @@ sub prev_day{ #{{{ ----------------------------------------------
 =head2 $minical->prev_day()
 
 Sets the calendar to the previous day.
-The selected date is highlighted.
+The selected date is hilighted.
 
 =cut
 
@@ -461,7 +604,7 @@ sub next_day{ #{{{ ----------------------------------------------
 =head2 $minical->next_day()
 
 Sets the calendar to the next day.
-The selected date is highlighted.
+The selected date is hilighted.
 
 =cut
 
@@ -481,7 +624,8 @@ sub display_month{ #{{{ --------------------------------------------
 
 =head2 $minical->display_month($year, $month)
 
-Displays the specified month.
+Displays the specified month. When a callback for the E<lt>Display-MonthE<gt> event has
+been registered it will be called with ($year, $month, 1) as parameters.
 
 =cut
 
@@ -493,13 +637,7 @@ Displays the specified month.
   $w->{YEAR_BAK} = $yyyy;
   $w->{MONTH}     = $mm;
 
-  if ($Tk::VERSION < $TKV) {
-    $w->{l_mm}->configure(
-        -text => $w->{MONNAME}[$mm-1],
-  );
-  } else {
-    $mtxt = $w->{MONNAME}[$mm-1],
-  }
+  $mtxt = $w->{MONNAME}[$mm-1];
 
   my $day = " ";
   my $dim = Days_in_Month($yyyy, $mm);
@@ -512,28 +650,44 @@ Displays the specified month.
       $day = 1 if  $day eq " " and $i == 0 and $j+1 == $dow ;
       $w->{MON_ARR}->[$i][$j] -> configure(
         -text => $day,
-        -background => "white",
-        -foreground => "black",
+        -background => $w->{BG_COLOR},
+        -foreground => $w->{FG_COLOR},
       );
       $day ++ if $day ne " ";
       $day = " " if $day =~ /\d/ and $day > $dim;
     }
   }
 
-  # if current month contains selected day: highlight it
-  _select_day($w, $w->{SEL_YEAR}, $w->{SEL_MONTH}, $w->{SEL_DAY});
+  # callback if defined:
+  $w->{CALLBACK}->{'<Display-Month>'}($yyyy, $mm, 1) if defined $w->{CALLBACK}->{'<Display-Month>'};
+
+  # if current month contains selected day: hilight it
+  _select_day($w, $w->{SEL_YEAR}, $w->{SEL_MONTH}, $w->{SEL_DAY}, $w->{BG_SEL_COLOR}, $w->{FG_SEL_COLOR});
 
 } # display_month }}}
 
 # Internal methods
 
+sub hilight { # {{{
+
+=head2 $minical->hilight($year, $month, $day, $background, $foreground)
+
+This method can be used to hilight the specified day with different background/foreground colors.
+May be used in a callback for the E<lt>Display-MonthE<gt> event.
+
+=cut
+
+  my ($w, $yyyy, $mm, $dd, $bg, $fg) = @_;
+  _select_day($w, $yyyy, $mm, $dd, $bg, $fg);
+} # hilight }}}
+
 sub _select_day { # {{{
-  my ($w, $yyyy, $mm, $dd) = @_;
+  my ($w, $yyyy, $mm, $dd, $bg, $fg) = @_;
  #print $w, "\n";
   return if $yyyy != $w->{YEAR};
   return if $mm   != $w->{MONTH};
 
-  # current year and month contains day which must be highlighted
+  # current year and month contains day which must be hilighted
   my $dow = Day_of_Week($yyyy, $mm, 1); # first day in month ...
   my $pos = $dow -2 + $dd;  # position (index) of $dd in linear mode
   #        +--- $dow -1   ($dow == 3)
@@ -553,8 +707,8 @@ sub _select_day { # {{{
   my $j = $pos % 7;
 # print " yyyy: $yyyy  mm: $mm  dd: $dd   dow: $dow\npos: $pos, i: $i, j: $j\n";
   $w->{MON_ARR}->[$i][$j]->configure(
-    -background => "blue",
-    -foreground => "white",
+    -background => $bg,
+    -foreground => $fg,
   );
 
 } # _select_day }}}
@@ -575,6 +729,18 @@ sub _sel { #{{{
   display_month($w,  $w->{YEAR}, $w->{MONTH});
   $w->{CALLBACK}->{'<Button-1>'}($w->{SEL_YEAR}, $w->{SEL_MONTH}, $w->{SEL_DAY}) if defined $w->{CALLBACK}->{'<Button-1>'};
 } # _sel }}}
+
+sub _configure_labels { # {{{
+
+  my ($w) = @_;
+  for (my $i=0; $i< 7; $i++) {
+
+    $w->{LABELS}->[$i]->configure(
+        -background => $w->{BG_LABEL_COLOR},
+        -foreground => $w->{FG_LABEL_COLOR},
+      );
+    }
+} # _configure_labels }}}
 
 # Event Handling: {{{
 #
@@ -633,6 +799,21 @@ sub _check_i_j {
   }
 } # _check_i_j }}}
 # }}}
+
+sub _get_month_label { # {{{
+  my ($w) = @_;
+  if ($Tk::VERSION < $TKV) {
+    return $w->{MONNAME}[$w->{MONTH} -1];
+  } else {
+    return ${$w->{l_mm}->cget("-text")};
+  }
+} # _get_month_label }}} for testing only
+
+sub _get_month_names { # {{{
+  my ($w) = @_;
+  return @{$w->{MONNAME}};
+} # _get_month_names }}} for testing only
+
 1;
 
 __END__
@@ -645,7 +826,7 @@ Lorenz Domke, E<lt>lorenz.domke@gmx.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by Lorenz Domke
+Copyright (C) 2008 by Lorenz Domke
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

@@ -1,5 +1,17 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.12  Mon Feb 18 09:34:28 2008
+  - error corrected: last error correction for ">" and "<" buttons was buggy 
+    (pop up for month names did not work correctly)
+
+0.11  Wed Jan 23 13:25:14 2008
+  - new options for colors
+    -fg_color, -bg_color, -fg_label_color, -bg_label_color, -fg_sel_color, -bg_sel_color
+  - callback vor '<Display-Month>'
+  - hilight($yyyy, $mm, $dd) method
+  - error corrected: display label for month was incorrect when using the
+    ">" and "<" buttons in version 0.10
+
 0.10  Tue Dec 04 12:37:42 2008
   - check Tk Version. Versions less than 804.027 will not use
     Tk::BrowseEntry
