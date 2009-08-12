@@ -1,7 +1,10 @@
 package Tk::MiniCalendar;
 
-our $VERSION = "0.12";
-our $TKV = "804.027";
+use strict;
+use warnings;
+
+our $VERSION = '0.13';
+our $TKV = '804.027';
 
 use Tk;
 use Tk::BrowseEntry;
@@ -14,7 +17,6 @@ use Date::Calc qw(
   Add_Delta_Days
   Today
 );
-use strict;
 
 require Tk::Frame;
 use base qw(Tk::Frame);
@@ -204,7 +206,6 @@ my @validArgs = qw( -day -month -year -day_names -month_names -bg_color -fg_colo
  -bg_sel_color -fg_sel_color
 );
 
-our $mtxt;
 
 sub Populate { # {{{
   my ($w, $args) = @_;
@@ -326,14 +327,14 @@ EOT
   } else {
     $text = <<'EOT';
 
-  $mtxt = $w->{MONNAME}[$w->{MONTH}-1];
+  $w->{mtxt} = $w->{MONNAME}[$w->{MONTH}-1];
   $w->{l_mm} = $frm1->BrowseEntry(
-    -variable   => \$mtxt,
+    -variable   => \$w->{mtxt},
     -width      => 10,
     -background => "white",
     -listheight => 12,
     -browsecmd => sub {
-        $w->{MONTH} = index_of($w, $mtxt);
+        $w->{MONTH} = index_of($w, $w->{mtxt});
         display_month($w,  $w->{YEAR}, $w->{MONTH});
      },
      -choices => $w->{MONNAME},
@@ -342,16 +343,6 @@ EOT
   }
   eval $text;
 
-  sub index_of {
-    my $w = shift;
-    my $m_name = shift;
-    my $i = 0;
-    foreach my $mnm ( @{ $w->{MONNAME} }){
-      $i++;
-      return $i if $mnm eq $m_name;
-    }
-    return $i;
-  }
 
 
   my $e_yyyy = $frm1->Entry(
@@ -448,18 +439,29 @@ EOT
 
 # print "-----\n";
 # print Dumper $w;
-
+  return;
 } # Populate }}}
 
 # Methods
+sub index_of { # {{{
+  my $w = shift;
+  my $m_name = shift;
+  my $i = 0;
+  foreach my $mnm ( @{ $w->{MONNAME} }){
+    $i++;
+    return $i if $mnm eq $m_name;
+  }
+  return $i;
+} # index_of }}}
 
 sub day { # {{{
   my ($w, $d) = @_;
   if ($#_ > 0 ){
     $w->{SEL_DAY} = $d;
     display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
+    return;
   } else {
-    $w->{SEL_DAY};
+    return $w->{SEL_DAY};
   }
 } # }}}
 
@@ -469,8 +471,9 @@ sub month { # {{{
     $w->{SEL_MONTH} = $m;
     display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
   } else {
-    $w->{SEL_MONTH};
+    return $w->{SEL_MONTH};
   }
+  return;
 } # }}}
 
 sub year { # {{{
@@ -479,8 +482,9 @@ sub year { # {{{
     $w->{SEL_YEAR} = $y;
     display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
   } else {
-    $w->{SEL_YEAR};
+    return $w->{SEL_YEAR};
   }
+  return;
 } # }}}
 
 sub fg_color { # {{{
@@ -489,8 +493,9 @@ sub fg_color { # {{{
     $w->{FG_COLOR} = $c;
     display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
   } else {
-    $w->{FG_COLOR};
+    return $w->{FG_COLOR};
   }
+  return;
 } # }}}
 
 sub bg_color { # {{{
@@ -499,8 +504,9 @@ sub bg_color { # {{{
     $w->{BG_COLOR} = $c;
     display_month($w, $w->{SEL_YEAR}, $w->{SEL_MONTH});
   } else {
-    $w->{BG_COLOR};
+    return $w->{BG_COLOR};
   }
+  return;
 } # }}}
 
 sub fg_label_color { # {{{
@@ -509,8 +515,9 @@ sub fg_label_color { # {{{
     $w->{FG_LABEL_COLOR} = $c;
     _configure_labels($w);
   } else {
-    $w->{FG_LABEL_COLOR};
+    return $w->{FG_LABEL_COLOR};
   }
+  return;
 } # }}}
 
 sub bg_label_color { # {{{
@@ -519,8 +526,9 @@ sub bg_label_color { # {{{
     $w->{BG_LABEL_COLOR} = $c;
     _configure_labels($w);
   } else {
-    $w->{BG_LABEL_COLOR};
+    return $w->{BG_LABEL_COLOR};
   }
+  return;
 } # }}}
 
 sub fg_sel_color { # {{{
@@ -528,8 +536,9 @@ sub fg_sel_color { # {{{
   if ($#_ > 0 ){
     $w->{FG_SEL_COLOR} = $c;
   } else {
-    $w->{FG_SEL_COLOR};
+    return $w->{FG_SEL_COLOR};
   }
+  return;
 } # }}}
 
 sub bg_sel_color { # {{{
@@ -537,8 +546,9 @@ sub bg_sel_color { # {{{
   if ($#_ > 0 ){
     $w->{BG_SEL_COLOR} = $c;
   } else {
-    $w->{BG_SEL_COLOR};
+    return $w->{BG_SEL_COLOR};
   }
+  return;
 } # }}}
 
 sub date{ #{{{ -----------------------------------------------------
@@ -576,6 +586,7 @@ and month. The selected date is hilighted.
   } else {
     croak "Error in date: $yyyy, $mm, $dd";
   }
+  return;
 } # select_date }}}
 
 sub prev_day{ #{{{ ----------------------------------------------
@@ -597,6 +608,7 @@ The selected date is hilighted.
   } else {
     croak "Error in date: $yyyy, $mm, $dd";
   }
+  return;
 } # prev_day }}}
 
 sub next_day{ #{{{ ----------------------------------------------
@@ -618,6 +630,7 @@ The selected date is hilighted.
   } else {
     croak "Error in date: $yyyy, $mm, $dd";
   }
+  return;
 } # next_day }}}
 
 sub display_month{ #{{{ --------------------------------------------
@@ -637,7 +650,7 @@ been registered it will be called with ($year, $month, 1) as parameters.
   $w->{YEAR_BAK} = $yyyy;
   $w->{MONTH}     = $mm;
 
-  $mtxt = $w->{MONNAME}[$mm-1];
+  $w->{mtxt} = $w->{MONNAME}[$mm-1];
 
   my $day = " ";
   my $dim = Days_in_Month($yyyy, $mm);
@@ -664,6 +677,7 @@ been registered it will be called with ($year, $month, 1) as parameters.
   # if current month contains selected day: hilight it
   _select_day($w, $w->{SEL_YEAR}, $w->{SEL_MONTH}, $w->{SEL_DAY}, $w->{BG_SEL_COLOR}, $w->{FG_SEL_COLOR});
 
+  return;
 } # display_month }}}
 
 # Internal methods
@@ -679,6 +693,7 @@ May be used in a callback for the E<lt>Display-MonthE<gt> event.
 
   my ($w, $yyyy, $mm, $dd, $bg, $fg) = @_;
   _select_day($w, $yyyy, $mm, $dd, $bg, $fg);
+  return;
 } # hilight }}}
 
 sub _select_day { # {{{
@@ -710,7 +725,7 @@ sub _select_day { # {{{
     -background => $bg,
     -foreground => $fg,
   );
-
+  return;
 } # _select_day }}}
 
 sub _sel { #{{{
@@ -728,6 +743,7 @@ sub _sel { #{{{
 
   display_month($w,  $w->{YEAR}, $w->{MONTH});
   $w->{CALLBACK}->{'<Button-1>'}($w->{SEL_YEAR}, $w->{SEL_MONTH}, $w->{SEL_DAY}) if defined $w->{CALLBACK}->{'<Button-1>'};
+  return;
 } # _sel }}}
 
 sub _configure_labels { # {{{
@@ -739,7 +755,8 @@ sub _configure_labels { # {{{
         -background => $w->{BG_LABEL_COLOR},
         -foreground => $w->{FG_LABEL_COLOR},
       );
-    }
+  }
+  return;
 } # _configure_labels }}}
 
 # Event Handling: {{{
@@ -748,7 +765,7 @@ sub register {# {{{
   my ($w, $event, $coderef) = @_;
   $w->{CALLBACK}->{$event} = $coderef;
 
-
+  return;
 } # register }}}
 
 sub _b2 {
@@ -756,6 +773,7 @@ sub _b2 {
   my ($yyyy, $mm, $dd) = _check_i_j($w, $i, $j);
   return unless defined $yyyy;
   $w->{CALLBACK}->{'<Button-2>'}($yyyy, $mm, $dd) if defined $w->{CALLBACK}->{'<Button-2>'};
+  return;
 }
 
 sub _b3 {
@@ -763,6 +781,7 @@ sub _b3 {
   my ($yyyy, $mm, $dd) = _check_i_j($w, $i, $j);
   return unless defined $yyyy;
   $w->{CALLBACK}->{'<Button-3>'}($yyyy, $mm, $dd) if defined $w->{CALLBACK}->{'<Button-3>'};
+  return;
 }
 
 sub _d1 {
@@ -770,6 +789,7 @@ sub _d1 {
   my ($yyyy, $mm, $dd) = _check_i_j($w, $i, $j);
   return unless defined $yyyy;
   $w->{CALLBACK}->{'<Double-1>'}($yyyy, $mm, $dd) if defined $w->{CALLBACK}->{'<Double-1>'};
+  return;
 }
 
 sub _d2 {
@@ -777,6 +797,7 @@ sub _d2 {
   my ($yyyy, $mm, $dd) = _check_i_j($w, $i, $j);
   return unless defined $yyyy;
   $w->{CALLBACK}->{'<Double-2>'}($yyyy, $mm, $dd) if defined $w->{CALLBACK}->{'<Double-2>'};
+  return;
 }
 
 sub _d3 {
@@ -784,6 +805,7 @@ sub _d3 {
   my ($yyyy, $mm, $dd) = _check_i_j($w, $i, $j);
   return unless defined $yyyy;
   $w->{CALLBACK}->{'<Double-3>'}($yyyy, $mm, $dd) if defined $w->{CALLBACK}->{'<Double-3>'};
+  return;
 }
 
 

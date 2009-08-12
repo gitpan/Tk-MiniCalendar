@@ -1,12 +1,13 @@
 # vim:ft=perl:foldcolumn=4
 #########################
-use Test::More;
+use strict;
+use warnings;
+use Test::More 'no_plan';
 use Tk;
 use Date::Calc qw(
   Today
   Add_Delta_Days
 );
-BEGIN { plan tests => 7 };
 use Tk::MiniCalendar;
 ok(1, "load module"); # If we made it this far, we're ok.
 
@@ -14,13 +15,15 @@ ok(1, "load module"); # If we made it this far, we're ok.
 
 # test usage of two MiniCalendars in one application
 
-use strict;
-use warnings;
-
 use Tk;
 use Tk::MiniCalendar;
 
 my $top = MainWindow->new(-title => "use2");
+if (! $top) {
+  # there seems to be no x-server available or something else went wrong
+  # .. skip all tests
+  exit 0;
+}
 my $l = $top->Label(
   -text => <<EOT,
   Please select date of tomorrow in upper 

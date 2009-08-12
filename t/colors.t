@@ -1,12 +1,18 @@
 #########################
-use Test::More;
+use strict;
+use warnings;
+use Test::More 'no_plan';
 use Tk;
-BEGIN { plan tests => 2 };
 use Tk::MiniCalendar;
 ok(1, "load module"); # If we made it this far, we're ok.
 
 #########################
 my $top = MainWindow->new(-title => "colors");
+if (! $top) {
+  # there seems to be no x-server available or something else went wrong
+  # .. skip all tests
+  exit 0;
+}
 
 my $frm1=$top->Frame->pack;
 my $frm2=$top->Frame->pack;

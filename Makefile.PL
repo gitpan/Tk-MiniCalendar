@@ -6,7 +6,10 @@ our $TKV = "804.027";
 WriteMakefile(
     NAME              => 'Tk::MiniCalendar',
     VERSION_FROM      => 'lib/Tk/MiniCalendar.pm', # finds $VERSION
-    dist => { POSTOP => ('@echo "************  ATTENTION: are README, Changes und MANIFEST ok ? *******"') },
+    dist => {
+      POSTOP => ('@echo "************  ATTENTION: are README, Changes und MANIFEST ok ? *******"'),
+      TARFLAGS => '--create --verbose --mode=0700 --file',
+    },
     PREREQ_PM         => {Tk::XPMs => 1.03,
                           Date::Calc => 5.0,
                           Tk => $TKV,

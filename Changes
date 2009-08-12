@@ -1,5 +1,9 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.13  Wed Aug 12 13:40:34 2009
+  - Bug with two MiniCalendars fixed: Change of month in one calendar
+    led to update of month name in both calendars.
+
 0.12  Mon Feb 18 09:34:28 2008
   - error corrected: last error correction for ">" and "<" buttons was buggy 
     (pop up for month names did not work correctly)

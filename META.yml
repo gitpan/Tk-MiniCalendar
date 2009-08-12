@@ -1,13 +1,16 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Tk-MiniCalendar
-version:      0.12
-version_from: lib/Tk/MiniCalendar.pm
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                Tk-MiniCalendar
+version:             0.13
+abstract:            simple calendar widget for date selection
+license:             ~
+author:              
+    - Lorenz Domke <lorenz.domke\@gmx.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
     Date::Calc:                    5
     Tk:                            804.027
     Tk::XPMs:                      1.03
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
