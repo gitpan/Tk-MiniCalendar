@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Tk-MiniCalendar
-version:             0.13
+version:             0.14
 abstract:            simple calendar widget for date selection
 license:             ~
 author:              

@@ -3,7 +3,7 @@ package Tk::MiniCalendar;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 our $TKV = '804.027';
 
 use Tk;
@@ -130,7 +130,7 @@ Here is a fullblown example for the usage of Tk::MiniCalendar
                   print "Selected date: $year/$month/$day\n";
                   exit;
                 },
-            );
+            )->pack;
  MainLoop;
 
 =head1 OPTIONS

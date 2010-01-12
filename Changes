@@ -1,5 +1,8 @@
 Revision history for Perl extension Tk::MiniCalendar.
 
+0.14  Tue Jan 12 14:17:38 2010
+  - missing ->pack added in POD docu (full blown example for Tk::MiniCalendar)
+
 0.13  Wed Aug 12 13:40:34 2009
   - Bug with two MiniCalendars fixed: Change of month in one calendar
     led to update of month name in both calendars.
